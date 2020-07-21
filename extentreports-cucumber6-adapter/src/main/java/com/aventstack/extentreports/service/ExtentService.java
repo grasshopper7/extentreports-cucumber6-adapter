@@ -18,6 +18,7 @@ import com.aventstack.extentreports.reporter.ExtentKlovReporter;
 import com.aventstack.extentreports.reporter.ExtentLoggerReporter;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.ExtentTabularReporter;
+import com.aventstack.extentreports.reporter.JsonFormatter;
 
 public class ExtentService 
     implements Serializable {
@@ -65,6 +66,7 @@ public class ExtentService
         private static final String LOGGER = "logger";
         private static final String SPARK = "spark";
         private static final String TABULAR = "tabular";
+        private static final String JSONF = "json";
         
         private static final String INIT_AVENT_KEY = EXTENT_REPORTER + DELIM + AVENT + DELIM + START;
         private static final String INIT_BDD_KEY = EXTENT_REPORTER + DELIM + BDD + DELIM + START;
@@ -75,6 +77,7 @@ public class ExtentService
         private static final String INIT_LOGGER_KEY = EXTENT_REPORTER + DELIM + LOGGER + DELIM + START;
         private static final String INIT_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + START;
         private static final String INIT_TABULAR_KEY = EXTENT_REPORTER + DELIM + TABULAR + DELIM + START;
+        private static final String INIT_JSONF_KEY = EXTENT_REPORTER + DELIM + JSONF + DELIM + START;
         
         private static final String CONFIG_AVENT_KEY = EXTENT_REPORTER + DELIM + AVENT + DELIM + CONFIG;
         private static final String CONFIG_BDD_KEY = EXTENT_REPORTER + DELIM + BDD + DELIM + CONFIG;
@@ -94,6 +97,7 @@ public class ExtentService
         private static final String OUT_LOGGER_KEY = EXTENT_REPORTER + DELIM + LOGGER + DELIM + OUT;
         private static final String OUT_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + OUT;
         private static final String OUT_TABULAR_KEY = EXTENT_REPORTER + DELIM + TABULAR + DELIM + OUT;
+        private static final String OUT_JSONF_KEY = EXTENT_REPORTER + DELIM + JSONF + DELIM + OUT;
         
         static {
             if (INSTANCE.getStartedReporters().isEmpty()) {
@@ -141,6 +145,9 @@ public class ExtentService
                     if (properties.containsKey(INIT_TABULAR_KEY) && "true".equals(String.valueOf(properties.get(INIT_TABULAR_KEY))))
                         initTabular(properties);
                     
+                    if (properties.containsKey(INIT_JSONF_KEY) && "true".equals(String.valueOf(properties.get(INIT_JSONF_KEY))))
+                        initJsonf(properties);                  
+                    
                     addSystemInfo(properties);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -175,6 +182,9 @@ public class ExtentService
             
             if ("true".equals(System.getProperty(INIT_TABULAR_KEY)))
                 initTabular(null);
+            
+            if ("true".equals(System.getProperty(INIT_JSONF_KEY)))
+                initJsonf(null);
             
             addSystemInfo(System.getProperties());
         }
@@ -249,6 +259,12 @@ public class ExtentService
             String out = getOutputPath(properties, OUT_TABULAR_KEY);
             ExtentTabularReporter tabular = new ExtentTabularReporter(out);
             attach(tabular, properties, CONFIG_TABULAR_KEY);
+        }
+        
+        private static void initJsonf(Properties properties) {
+            String out = getOutputPath(properties, OUT_JSONF_KEY);
+            JsonFormatter jsonf = new JsonFormatter(out);
+            INSTANCE.attachReporter(jsonf);
         }
         
         private static void attach(ConfigurableReporter r, Properties properties, String configKey) {

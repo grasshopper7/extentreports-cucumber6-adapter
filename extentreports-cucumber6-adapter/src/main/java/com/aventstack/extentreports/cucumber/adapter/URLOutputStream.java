@@ -126,6 +126,7 @@ class URLOutputStream extends OutputStream {
 	}
 
 	class ResponseException extends IOException {
+		private static final long serialVersionUID = -1643050449805097598L;
 		private final Gson gson = new Gson();
 		private final int responseCode;
 		private final String contentType;

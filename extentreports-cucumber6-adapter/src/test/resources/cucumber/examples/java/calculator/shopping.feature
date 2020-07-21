@@ -17,6 +17,4 @@ Feature: Shopping
       
       Doing great.
       Whats new?
-      
-      Nothing much.
       """

@@ -30,7 +30,6 @@ import io.cucumber.messages.Messages.GherkinDocument.Feature;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.Scenario;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.Scenario.Examples;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.Step;
-import io.cucumber.messages.Messages.GherkinDocument.Feature.Step.DocString;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.TableRow;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.TableRow.TableCell;
 import io.cucumber.plugin.ConcurrentEventListener;
@@ -157,11 +156,11 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 		publisher.registerHandlerFor(WriteEvent.class, writeEventhandler);
 		publisher.registerHandlerFor(TestRunFinished.class, runFinishedHandler);
 	}
-	
+
 	@Override
-    public void setStrict(boolean strict) {
-        this.strict = strict;
-    }
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
 
 	private void handleTestSourceRead(TestSourceRead event) {
 		testSources.addTestSourceReadEvent(event.getUri(), event);
@@ -199,17 +198,17 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 			break;
 		case "undefined":
 			if (strict) {
-        		stepTestThreadLocal.get().fail("Step undefined");
-        		break;
-        	}
-        	stepTestThreadLocal.get().skip("Step undefined");
-        	break;
+				stepTestThreadLocal.get().fail("Step undefined");
+				break;
+			}
+			stepTestThreadLocal.get().skip("Step undefined");
+			break;
 		case "pending":
 		case "skipped":
 			if (isHookThreadLocal.get()) {
-        		ExtentService.getInstance().removeTest(stepTestThreadLocal.get());
-        		break;
-        	}
+				ExtentService.getInstance().removeTest(stepTestThreadLocal.get());
+				break;
+			}
 			Boolean currentEndingEventSkipped = stepTestThreadLocal.get().getModel().getLogContext() != null
 					&& !stepTestThreadLocal.get().getModel().getLogContext().isEmpty()
 							? stepTestThreadLocal.get().getModel().getLogContext().getLast().getStatus() == Status.SKIP
@@ -258,7 +257,7 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 					}
 					stepTestThreadLocal.get().info("",
 							MediaEntityBuilder.createScreenCaptureFromPath(screenshotRelPath + f.getName()).build());
-					//Screen shot for html report.
+					// Screen shot for html report.
 					stepTestThreadLocal.get().addScreenCaptureFromPath(screenshotRelPath + f.getName());
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
@@ -329,7 +328,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 					feature.getDescription());
 			featureTestThreadLocal.set(t);
 			featureMap.put(feature.getName(), t);
-			List<String> tagList = feature.getTagsList().stream().map(tag -> tag.getName()).collect(Collectors.toList());
+			List<String> tagList = feature.getTagsList().stream().map(tag -> tag.getName())
+					.collect(Collectors.toList());
 			tagList.forEach(featureTestThreadLocal.get()::assignCategory);
 		}
 	}
@@ -337,15 +337,13 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 	private synchronized void handleScenarioOutline(TestCase testCase) {
 		TestSourcesModel.AstNode astNode = testSources.getAstNode(currentFeatureFile.get(), testCase.getLine());
 		Scenario scenarioDefinition = TestSourcesModel.getScenarioDefinition(astNode);
-				
+
 		if (scenarioDefinition.getKeyword().equals("Scenario Outline")) {
-			//ScenarioOutline scenarioOutline = (ScenarioOutline) TestSourcesModel.getScenarioDefinition(astNode);
 			if (currentScenarioOutline.get() == null
 					|| !currentScenarioOutline.get().getName().equals(scenarioDefinition.getName())) {
 				scenarioOutlineThreadLocal.set(null);
 				createScenarioOutline(scenarioDefinition);
 				currentScenarioOutline.set(scenarioDefinition);
-				// addOutlineStepsToReport(scenarioOutline);
 			}
 			Examples examples = (Examples) astNode.parent.node;
 			if (currentExamples.get() == null || !currentExamples.get().equals(examples)) {
@@ -370,20 +368,11 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 					scenarioOutline.getDescription());
 			scenarioOutlineThreadLocal.set(t);
 			scenarioOutlineMap.put(scenarioOutline.getName(), t);
-			/*
-			 * List<String> tags = createTagsList(scenarioOutline.getTags());
-			 * tags.forEach(scenarioOutlineThreadLocal.get()::assignCategory);
-			 */
-			List<String> featureTags = scenarioOutlineThreadLocal.get().getModel()
-            		.getParent().getCategoryContext().getAll()
-            		.stream()
-            		.map(x -> x.getName())
-            		.collect(Collectors.toList());
-            scenarioOutline.getTagsList()
-            	.stream()
-            	.map(x -> x.getName())
-            	.filter(x -> !featureTags.contains(x))
-            	.forEach(scenarioOutlineThreadLocal.get()::assignCategory);
+
+			List<String> featureTags = scenarioOutlineThreadLocal.get().getModel().getParent().getCategoryContext()
+					.getAll().stream().map(x -> x.getName()).collect(Collectors.toList());
+			scenarioOutline.getTagsList().stream().map(x -> x.getName()).filter(x -> !featureTags.contains(x))
+					.forEach(scenarioOutlineThreadLocal.get()::assignCategory);
 		}
 	}
 
@@ -452,8 +441,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 		StepArgument argument = testStep.getStep().getArgument();
 		if (argument != null) {
 			if (argument instanceof DocStringArgument) {
-				// createDocStringMap((DocStringArgument)argument);
-				stepTestThreadLocal.get().pass(createDocString((DocStringArgument) argument));
+				stepTestThreadLocal.get()
+						.pass(MarkupHelper.createCodeBlock(((DocStringArgument) argument).getContent()));
 			} else if (argument instanceof DataTableArgument) {
 				stepTestThreadLocal.get()
 						.pass(MarkupHelper.createTable(createDataTableList((DataTableArgument) argument)).getMarkup());
@@ -472,10 +461,6 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 				data[i][j] = cells.get(i).get(j);
 		}
 		return data;
-	}
-
-	private String createDocString(DocStringArgument docString) {
-		return docString.getContent().replaceAll("(\r\n|\n)", "<br />");
 	}
 
 	// the below additions are from PR #33

@@ -29,7 +29,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cucumber.version>6.1.0</cucumber.version>
+		<cucumber.version>6.2.0</cucumber.version>
+		<extent.version>4.1.7</extent.version>
 	</properties>
 
 	<scm>
@@ -42,7 +43,7 @@
 		<dependency>
 			<groupId>com.aventstack</groupId>
 			<artifactId>extentreports</artifactId>
-			<version>4.1.6</version>
+			<version>${extent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.cucumber</groupId>
