@@ -6,6 +6,6 @@ To build from source use ```install -Dmaven.test.failure.ignore=true``` or ```in
 <dependency>
     <groupId>tech.grasshopper</groupId>
     <artifactId>extentreports-cucumber6-adapter</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
