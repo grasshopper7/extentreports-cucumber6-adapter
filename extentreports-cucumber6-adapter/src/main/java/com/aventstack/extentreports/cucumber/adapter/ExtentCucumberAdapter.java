@@ -59,9 +59,6 @@ import io.cucumber.plugin.event.WriteEvent;
  */
 public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAware {
 
-	private static final String SCREENSHOT_DIR_PROPERTY = "screenshot.dir";
-	private static final String SCREENSHOT_REL_PATH_PROPERTY = "screenshot.rel.path";
-
 	private static Map<String, ExtentTest> featureMap = new ConcurrentHashMap<>();
 	private static ThreadLocal<ExtentTest> featureTestThreadLocal = new InheritableThreadLocal<>();
 	private static Map<String, ExtentTest> scenarioOutlineMap = new ConcurrentHashMap<>();
@@ -70,8 +67,6 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 	private static ThreadLocal<Boolean> isHookThreadLocal = new InheritableThreadLocal<>();
 	private static ThreadLocal<ExtentTest> stepTestThreadLocal = new InheritableThreadLocal<>();
 
-	private String screenshotDir;
-	private String screenshotRelPath;
 	private boolean strict = false;
 
 	@SuppressWarnings("serial")
@@ -139,11 +134,6 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 
 	public ExtentCucumberAdapter(String arg) {
 		ExtentService.getInstance();
-		Object prop = ExtentService.getProperty(SCREENSHOT_DIR_PROPERTY);
-		screenshotDir = prop == null ? "test-output/" : String.valueOf(prop);
-		prop = ExtentService.getProperty(SCREENSHOT_REL_PATH_PROPERTY);
-		screenshotRelPath = prop == null || String.valueOf(prop).isEmpty() ? screenshotDir : String.valueOf(prop);
-		screenshotRelPath = screenshotRelPath == null ? "" : screenshotRelPath;
 	}
 
 	@Override
@@ -256,9 +246,9 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 						stepTestThreadLocal.set(t);
 					}
 					stepTestThreadLocal.get().info("",
-							MediaEntityBuilder.createScreenCaptureFromPath(screenshotRelPath + f.getName()).build());
+							MediaEntityBuilder.createScreenCaptureFromPath(ExtentService.getScreenshotReportRelatvePath() + f.getName()).build());
 					// Screen shot for html report.
-					stepTestThreadLocal.get().addScreenCaptureFromPath(screenshotRelPath + f.getName());
+					stepTestThreadLocal.get().addScreenCaptureFromPath(ExtentService.getScreenshotReportRelatvePath() + f.getName());
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
@@ -287,7 +277,7 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 
 	private URL toUrl(String fileName) {
 		try {
-			URL url = Paths.get(screenshotDir, fileName).toUri().toURL();
+			URL url = Paths.get(ExtentService.getScreenshotFolderName(), fileName).toUri().toURL();
 			return url;
 		} catch (IOException e) {
 			throw new CucumberException(e);

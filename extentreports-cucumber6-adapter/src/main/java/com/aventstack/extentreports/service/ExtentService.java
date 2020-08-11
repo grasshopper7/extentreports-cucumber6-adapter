@@ -3,6 +3,8 @@ package com.aventstack.extentreports.service;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
@@ -35,6 +37,14 @@ public class ExtentService
         String sys = System.getProperty(key);
         return sys == null ? (properties == null ? null : properties.get(key)) : sys;
     }
+    
+    public static String getScreenshotFolderName() {
+		return ExtentReportsLoader.SCREENSHOT_FOLDER_NAME;
+	}
+
+	public static String getScreenshotReportRelatvePath() {
+		return ExtentReportsLoader.SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH;
+	}
 
     @SuppressWarnings("unused")
     private ExtentReports readResolve() {
@@ -99,10 +109,22 @@ public class ExtentService
         private static final String OUT_TABULAR_KEY = EXTENT_REPORTER + DELIM + TABULAR + DELIM + OUT;
         private static final String OUT_JSONF_KEY = EXTENT_REPORTER + DELIM + JSONF + DELIM + OUT;
         
+		private static String SCREENSHOT_FOLDER_NAME;
+		private static String SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH;
+		private static final String DEFAULT_SCREENSHOT_FOLDER_NAME = "test-output/";
+
+		private static final String SCREENSHOT_DIR_PROPERTY = "screenshot.dir";
+		private static final String SCREENSHOT_REL_PATH_PROPERTY = "screenshot.rel.path";
+
+		public static final String REPORTS_BASEFOLDER_NAME = "basefolder.name";
+		public static final String REPORTS_BASEFOLDER_DATETIMEPATTERN = "basefolder.datetimepattern";
+		private static final LocalDateTime FOLDER_CURRENT_TIMESTAMP = LocalDateTime.now();
+        
         static {
             if (INSTANCE.getStartedReporters().isEmpty()) {
                 createViaProperties();
                 createViaSystem();
+                configureScreenshotProperties();
             }
         }
         
@@ -189,20 +211,49 @@ public class ExtentService
             addSystemInfo(System.getProperties());
         }
         
+        private static String getBaseFolderName() {
+			String folderpattern = "";
+			Object baseFolderPrefix = getProperty(REPORTS_BASEFOLDER_NAME);
+			Object baseFolderPatternSuffix = getProperty(REPORTS_BASEFOLDER_DATETIMEPATTERN);
+
+			if (baseFolderPrefix != null && !String.valueOf(baseFolderPrefix).isEmpty()
+					&& baseFolderPatternSuffix != null && !String.valueOf(baseFolderPatternSuffix).isEmpty()) {
+				DateTimeFormatter folderSuffix = DateTimeFormatter.ofPattern(String.valueOf(baseFolderPatternSuffix));
+				folderpattern = baseFolderPrefix + " " + folderSuffix.format(FOLDER_CURRENT_TIMESTAMP) + "/";
+			}
+			return folderpattern;
+		}
+        
+		private static String getOutputPath(Properties properties, String key) {
+			String out;
+			if (properties != null && properties.get(key) != null)
+				out = String.valueOf(properties.get(key));
+			else
+				out = System.getProperty(key);
+			out = out == null || out.equals("null") || out.isEmpty() ? OUTPUT_PATH + key.split("\\.")[2] + "/" : out;
+			return getBaseFolderName() + out;
+		}
+        
+		private static void configureScreenshotProperties() {
+			Object property = getProperty(SCREENSHOT_DIR_PROPERTY);
+			SCREENSHOT_FOLDER_NAME = property == null || String.valueOf(property).isEmpty()
+					? DEFAULT_SCREENSHOT_FOLDER_NAME
+					: String.valueOf(property);
+			SCREENSHOT_FOLDER_NAME = getBaseFolderName() + SCREENSHOT_FOLDER_NAME;
+
+			property = getProperty(SCREENSHOT_REL_PATH_PROPERTY);
+			SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH = property == null || String.valueOf(property).isEmpty()
+					? SCREENSHOT_FOLDER_NAME
+					: String.valueOf(property);
+
+			// TODO: What does this line of code do?
+			//SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH = SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH == null ? "": SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH;
+		}
+		
         private static void initAvent(Properties properties) {
             String out = getOutputPath(properties, OUT_AVENT_KEY);
             ExtentAventReporter avent = new ExtentAventReporter(out);
             attach(avent, properties, CONFIG_AVENT_KEY);
-        }
-        
-        private static String getOutputPath(Properties properties, String key) {
-            String out;
-            if (properties != null && properties.get(key) != null)
-                out = String.valueOf(properties.get(key));
-            else 
-                out = System.getProperty(key);
-            out = out == null || out.equals("null") || out.isEmpty() ? OUTPUT_PATH + key.split("\\.")[2] + "/" : out;
-            return out;
         }
         
         private static void initBdd(Properties properties) {
