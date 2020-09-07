@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2.0.0 (2020-09-06)
+
+* Upgrade adapter to support extent version 5 [Issue 5](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/5)]
+* Remove StrictAware interface as deprecated [Issue 4](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/4)]
+
 ## 1.2.0 (2020-08-11)
 
 * Add date and time to report folders [Issue 8](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/8)

@@ -21,8 +21,7 @@ import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.gherkin.model.Asterisk;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
-import com.aventstack.extentreports.model.service.LogService;
-import com.aventstack.extentreports.model.service.TestService;
+import com.aventstack.extentreports.model.Test;
 import com.aventstack.extentreports.service.ExtentService;
 
 import io.cucumber.core.exception.CucumberException;
@@ -33,7 +32,6 @@ import io.cucumber.messages.Messages.GherkinDocument.Feature.Step;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.TableRow;
 import io.cucumber.messages.Messages.GherkinDocument.Feature.TableRow.TableCell;
 import io.cucumber.plugin.ConcurrentEventListener;
-import io.cucumber.plugin.StrictAware;
 import io.cucumber.plugin.event.DataTableArgument;
 import io.cucumber.plugin.event.DocStringArgument;
 import io.cucumber.plugin.event.EmbedEvent;
@@ -57,7 +55,7 @@ import io.cucumber.plugin.event.WriteEvent;
  * https://github.com/cucumber/cucumber-jvm/blob/master/core/src/main/java/cucumber/runtime/formatter/HTMLFormatter.java
  *
  */
-public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAware {
+public class ExtentCucumberAdapter implements ConcurrentEventListener {
 
 	private static Map<String, ExtentTest> featureMap = new ConcurrentHashMap<>();
 	private static ThreadLocal<ExtentTest> featureTestThreadLocal = new InheritableThreadLocal<>();
@@ -66,8 +64,6 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 	private static ThreadLocal<ExtentTest> scenarioThreadLocal = new InheritableThreadLocal<>();
 	private static ThreadLocal<Boolean> isHookThreadLocal = new InheritableThreadLocal<>();
 	private static ThreadLocal<ExtentTest> stepTestThreadLocal = new InheritableThreadLocal<>();
-
-	private boolean strict = false;
 
 	@SuppressWarnings("serial")
 	private static final Map<String, String> MIME_TYPES_EXTENSIONS = new HashMap<String, String>() {
@@ -147,11 +143,6 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 		publisher.registerHandlerFor(TestRunFinished.class, runFinishedHandler);
 	}
 
-	@Override
-	public void setStrict(boolean strict) {
-		this.strict = strict;
-	}
-
 	private void handleTestSourceRead(TestSourceRead event) {
 		testSources.addTestSourceReadEvent(event.getUri(), event);
 	}
@@ -182,16 +173,13 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 	}
 
 	private synchronized void updateResult(Result result) {
+		Test test = stepTestThreadLocal.get().getModel();
 		switch (result.getStatus().name().toLowerCase()) {
 		case "failed":
 			stepTestThreadLocal.get().fail(result.getError());
 			break;
 		case "undefined":
-			if (strict) {
-				stepTestThreadLocal.get().fail("Step undefined");
-				break;
-			}
-			stepTestThreadLocal.get().skip("Step undefined");
+			stepTestThreadLocal.get().fail("Step undefined");
 			break;
 		case "pending":
 		case "skipped":
@@ -199,10 +187,9 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 				ExtentService.getInstance().removeTest(stepTestThreadLocal.get());
 				break;
 			}
-			Boolean currentEndingEventSkipped = stepTestThreadLocal.get().getModel().getLogContext() != null
-					&& !stepTestThreadLocal.get().getModel().getLogContext().isEmpty()
-							? stepTestThreadLocal.get().getModel().getLogContext().getLast().getStatus() == Status.SKIP
-							: false;
+			boolean currentEndingEventSkipped = test.hasLog()
+					? test.getLogs().get(test.getLogs().size() - 1).getStatus() == Status.SKIP
+					: false;
 			if (result.getError() != null) {
 				stepTestThreadLocal.get().skip(result.getError());
 			} else if (!currentEndingEventSkipped) {
@@ -211,18 +198,12 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 			}
 			break;
 		case "passed":
-			if (stepTestThreadLocal.get() != null && stepTestThreadLocal.get().getModel().getLogContext().isEmpty()
-					&& !isHookThreadLocal.get()) {
+			if (stepTestThreadLocal.get() != null && !test.hasLog() && !isHookThreadLocal.get())
 				stepTestThreadLocal.get().pass("");
-			}
-
 			if (stepTestThreadLocal.get() != null) {
-				Boolean hasLog = TestService.testHasLog(stepTestThreadLocal.get().getModel());
-				Boolean hasScreenCapture = hasLog && LogService
-						.logHasScreenCapture(stepTestThreadLocal.get().getModel().getLogContext().getFirst());
-				if (isHookThreadLocal.get() && !hasLog && !hasScreenCapture) {
+				Boolean hasScreenCapture = test.hasLog() && test.getLogs().get(0).hasMedia();
+				if (isHookThreadLocal.get() && !test.hasLog() && !hasScreenCapture)
 					ExtentService.getInstance().removeTest(stepTestThreadLocal.get());
-				}
 			}
 			break;
 		default:
@@ -245,10 +226,9 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 						ExtentTest t = scenarioThreadLocal.get().createNode(Asterisk.class, "Embed");
 						stepTestThreadLocal.set(t);
 					}
-					stepTestThreadLocal.get().info("",
-							MediaEntityBuilder.createScreenCaptureFromPath(ExtentService.getScreenshotReportRelatvePath() + f.getName()).build());
-					// Screen shot for html report.
-					stepTestThreadLocal.get().addScreenCaptureFromPath(ExtentService.getScreenshotReportRelatvePath() + f.getName());
+					stepTestThreadLocal.get().info("", MediaEntityBuilder
+							.createScreenCaptureFromPath(ExtentService.getScreenshotReportRelatvePath() + f.getName())
+							.build());
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
@@ -359,8 +339,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 			scenarioOutlineThreadLocal.set(t);
 			scenarioOutlineMap.put(scenarioOutline.getName(), t);
 
-			List<String> featureTags = scenarioOutlineThreadLocal.get().getModel().getParent().getCategoryContext()
-					.getAll().stream().map(x -> x.getName()).collect(Collectors.toList());
+			List<String> featureTags = scenarioOutlineThreadLocal.get().getModel().getParent().getCategorySet().stream()
+					.map(x -> x.getName()).collect(Collectors.toList());
 			scenarioOutline.getTagsList().stream().map(x -> x.getName()).filter(x -> !featureTags.contains(x))
 					.forEach(scenarioOutlineThreadLocal.get()::assignCategory);
 		}
@@ -435,7 +415,7 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener, StrictAwa
 						.pass(MarkupHelper.createCodeBlock(((DocStringArgument) argument).getContent()));
 			} else if (argument instanceof DataTableArgument) {
 				stepTestThreadLocal.get()
-						.pass(MarkupHelper.createTable(createDataTableList((DataTableArgument) argument)).getMarkup());
+						.pass(MarkupHelper.createTable(createDataTableList((DataTableArgument) argument)));
 			}
 		}
 	}
