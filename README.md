@@ -1,8 +1,8 @@
-This deals with generating Extent reports for Cucumber-JVM version 6 using the ExtentReports Cucumber Adapter Plugin. For more details refer to this [article](http://grasshopper.tech/2098/)
+This deals with generating Extent reports for Cucumber-JVM version 6 using the ExtentReports Cucumber Adapter Plugin. For more details refer to this [article](http://grasshopper.tech/2098/). A sample usage of this adapter can be found [here](https://github.com/grasshopper7/cuke6-extent-adapter-report).
 
 To build from source use ```install -Dmaven.test.failure.ignore=true``` or ```install -Dmaven.test.skip=true```. This ignores intentional test failures from stopping the build.
 
-To work with the ExtentReports version 5, which includes support for latest Spark, Klov and Json reporters, add the below dependency. The HTML and Logger report, among other reporters, have been deprecated.
+To work with the latest [ExtentReports version 5](https://github.com/extent-framework/extentreports-java/wiki), which includes support for latest Spark, Klov and Json reporters, add the below dependency. The HTML and Logger reporters, among others, have been deprecated.
 
 ```
 <dependency>
