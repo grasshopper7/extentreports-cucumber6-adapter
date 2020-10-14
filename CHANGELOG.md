@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2.1.0 (2020-10-14)
+
+* Fixed missing parameterized values in scenario outline names [Issue 15](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/15)]
+
 ## 2.0.0 (2020-09-06)
 
 * Upgrade adapter to support extent version 5 [Issue 5](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/5)]
