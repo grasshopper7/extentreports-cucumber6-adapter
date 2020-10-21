@@ -157,7 +157,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 		isHookThreadLocal.set(false);
 
 		if (event.getTestStep() instanceof HookTestStep) {
-			ExtentTest t = scenarioThreadLocal.get().createNode(Asterisk.class, event.getTestStep().getCodeLocation());
+			ExtentTest t = scenarioThreadLocal.get().createNode(Asterisk.class, event.getTestStep().getCodeLocation(),
+					(((HookTestStep) event.getTestStep()).getHookType()).toString().toUpperCase());
 			stepTestThreadLocal.set(t);
 			isHookThreadLocal.set(true);
 		}

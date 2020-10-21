@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2.2.0 (2020-10-21)
+
+* Option to default your report to Dashboard [Issue 16](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/16)]
+* Add support for pdf reporter [Issue 20](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/20)]
+* Ability to determine hook type [Issue 21](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/21)]	
+
 ## 2.1.0 (2020-10-14)
 
 * Fixed missing parameterized values in scenario outline names [Issue 15](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/15)]

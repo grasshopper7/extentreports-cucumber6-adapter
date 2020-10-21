@@ -9,8 +9,10 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.observer.ExtentObserver;
@@ -18,6 +20,9 @@ import com.aventstack.extentreports.reporter.ExtentKlovReporter;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.JsonFormatter;
 import com.aventstack.extentreports.reporter.ReporterConfigurable;
+import com.aventstack.extentreports.reporter.configuration.ViewName;
+
+import tech.grasshopper.pdf.extent.ExtentPDFCucumberReporter;
 
 public class ExtentService implements Serializable {
 
@@ -59,21 +64,27 @@ public class ExtentService implements Serializable {
 		private static final String START = "start";
 		private static final String CONFIG = "config";
 		private static final String OUT = "out";
+		private static final String VIEW_ORDER = "vieworder";
 		private static final String DELIM = ".";
 
 		private static final String KLOV = "klov";
 		private static final String SPARK = "spark";
 		private static final String JSONF = "json";
+		private static final String PDF = "pdf";
 
 		private static final String INIT_KLOV_KEY = EXTENT_REPORTER + DELIM + KLOV + DELIM + START;
 		private static final String INIT_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + START;
 		private static final String INIT_JSONF_KEY = EXTENT_REPORTER + DELIM + JSONF + DELIM + START;
+		private static final String INIT_PDF_KEY = EXTENT_REPORTER + DELIM + PDF + DELIM + START;
 
 		private static final String CONFIG_KLOV_KEY = EXTENT_REPORTER + DELIM + KLOV + DELIM + CONFIG;
 		private static final String CONFIG_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + CONFIG;
 
 		private static final String OUT_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + OUT;
 		private static final String OUT_JSONF_KEY = EXTENT_REPORTER + DELIM + JSONF + DELIM + OUT;
+		private static final String OUT_PDF_KEY = EXTENT_REPORTER + DELIM + PDF + DELIM + OUT;
+
+		private static final String VIEW_ORDER_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + VIEW_ORDER;
 
 		private static String SCREENSHOT_FOLDER_NAME;
 		private static String SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH;
@@ -115,6 +126,10 @@ public class ExtentService implements Serializable {
 							&& "true".equals(String.valueOf(properties.get(INIT_JSONF_KEY))))
 						initJsonf(properties);
 
+					if (properties.containsKey(INIT_PDF_KEY)
+							&& "true".equals(String.valueOf(properties.get(INIT_PDF_KEY))))
+						initPdf(properties);
+
 					addSystemInfo(properties);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -129,6 +144,9 @@ public class ExtentService implements Serializable {
 
 			if ("true".equals(System.getProperty(INIT_JSONF_KEY)))
 				initJsonf(null);
+
+			if ("true".equals(System.getProperty(INIT_PDF_KEY)))
+				initPdf(null);
 
 			addSystemInfo(System.getProperties());
 		}
@@ -192,13 +210,30 @@ public class ExtentService implements Serializable {
 		private static void initSpark(Properties properties) {
 			String out = getOutputPath(properties, OUT_SPARK_KEY);
 			ExtentSparkReporter spark = new ExtentSparkReporter(out);
+			sparkReportViewOrder(spark);
 			attach(spark, properties, CONFIG_SPARK_KEY);
+		}
+
+		private static void sparkReportViewOrder(ExtentSparkReporter spark) {
+			try {
+				List<ViewName> viewOrder = Arrays.stream(String.valueOf(getProperty(VIEW_ORDER_SPARK_KEY)).split(","))
+						.map(v -> ViewName.valueOf(v.toUpperCase())).collect(Collectors.toList());
+				spark.viewConfigurer().viewOrder().as(viewOrder).apply();
+			} catch (Exception e) {
+				//Do nothing. Use default order.
+			}
 		}
 
 		private static void initJsonf(Properties properties) {
 			String out = getOutputPath(properties, OUT_JSONF_KEY);
 			JsonFormatter jsonf = new JsonFormatter(out);
 			INSTANCE.attachReporter(jsonf);
+		}
+
+		private static void initPdf(Properties properties) {
+			String out = getOutputPath(properties, OUT_PDF_KEY);
+			ExtentPDFCucumberReporter pdf = new ExtentPDFCucumberReporter(out);
+			INSTANCE.attachReporter(pdf);
 		}
 
 		private static void attach(ReporterConfigurable r, Properties properties, String configKey) {
