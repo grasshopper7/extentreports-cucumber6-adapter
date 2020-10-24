@@ -199,12 +199,14 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 			}
 			break;
 		case "passed":
-			if (stepTestThreadLocal.get() != null && !test.hasLog() && !isHookThreadLocal.get())
-				stepTestThreadLocal.get().pass("");
 			if (stepTestThreadLocal.get() != null) {
-				Boolean hasScreenCapture = test.hasLog() && test.getLogs().get(0).hasMedia();
-				if (isHookThreadLocal.get() && !test.hasLog() && !hasScreenCapture)
-					ExtentService.getInstance().removeTest(stepTestThreadLocal.get());
+				if (isHookThreadLocal.get()) {
+					boolean mediaLogs = !test.getLogs().stream().filter(l -> l.getMedia() != null)
+							.collect(Collectors.toList()).isEmpty();
+					if (!test.hasLog() && !mediaLogs)
+						ExtentService.getInstance().removeTest(stepTestThreadLocal.get());
+				}
+				stepTestThreadLocal.get().pass("");
 			}
 			break;
 		default:

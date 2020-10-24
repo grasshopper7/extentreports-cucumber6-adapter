@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2.3.0 (2020-10-24)
+
+* "Passed" Step duration not correct when multiple logs are attached [Issue 24](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/24)]
+
 ## 2.2.0 (2020-10-21)
 
 * Option to default your report to Dashboard [Issue 16](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/16)]
