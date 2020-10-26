@@ -31,6 +31,17 @@ screenshot.dir=test-output/
 screenshot.rel.path=../
 ```
 
+**Extent PDF Reporter** *(NEW FEATURE)* - The PDF reporter summarizes the test run results in a **dashboard** and other sections with **feature, scenario and step details**.
+
+![sample](summary.png)
+
+The PDF report is needs to be enabled in the extent.properties file.
+```
+extent.reporter.pdf.start=true
+extent.reporter.pdf.out=test output/PdfReport/ExtentPdf.pdf
+```
+The default color settings can be modified by using a YAML config file, named pdf-config.yaml in the project src/test/resource folder. The detailed documentation for this feature is available in this [article](http://grasshopper.tech/2224/).
+
 **Customized Report Folder Name** *(NEW FEATURE)* - To enable report folder name with date and\or time details, two settings need to be added to the extent.properties. These are **basefolder.name** and **basefolder.datetimepattern**. These will be merged to create the base folder name, inside which the reports will be generated. The basefolder.datetimepattern value should be a **valid date time formatter pattern**. For more details refer to the **Customized Report Folder Name** section of the [article](http://grasshopper.tech/2098/).
 
 ```
