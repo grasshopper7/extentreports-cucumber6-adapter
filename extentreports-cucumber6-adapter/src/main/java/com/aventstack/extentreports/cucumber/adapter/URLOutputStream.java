@@ -39,7 +39,7 @@ class URLOutputStream extends OutputStream {
 		this.method = method;
 		this.expectedResponseCode = expectedResponseCode;
 		if (url.getProtocol().equals("file")) {
-			//File file = new File(url.getFile());
+			// File file = new File(url.getFile());
 			File file = new File(url.toURI().getPath());
 			ensureParentDirExists(file);
 			out = new FileOutputStream(file);
