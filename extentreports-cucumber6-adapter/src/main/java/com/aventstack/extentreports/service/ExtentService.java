@@ -138,6 +138,9 @@ public class ExtentService implements Serializable {
 		}
 
 		private static void createViaSystem() {
+			
+			if ("true".equals(System.getProperty(INIT_KLOV_KEY)))
+				initKlov(null);
 
 			if ("true".equals(System.getProperty(INIT_SPARK_KEY)))
 				initSpark(null);
@@ -195,6 +198,7 @@ public class ExtentService implements Serializable {
 			if (configPath != null && !configPath.isEmpty() && f.exists()) {
 				// Object prop = ExtentService.getProperty("screenshot.dir");
 				// String screenshotDir = prop == null ? "test-output/" : String.valueOf(prop);
+				configureScreenshotProperties();
 				String url = Paths.get(SCREENSHOT_FOLDER_NAME).toString();
 				ExtentService.getInstance().tryResolveMediaPath(new String[] { url });
 				try {
