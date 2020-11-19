@@ -3,6 +3,7 @@ package com.aventstack.extentreports.cucumber.adapter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -289,6 +290,12 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 
 	private synchronized void createFeature(TestCase testCase) {
 		Feature feature = testSources.getFeature(testCase.getUri());
+		try {
+			ExtentService.getInstance().setGherkinDialect(feature.getLanguage());
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}		
+		
 		if (feature != null) {
 			if (featureMap.containsKey(feature.getName())) {
 				featureTestThreadLocal.set(featureMap.get(feature.getName()));
