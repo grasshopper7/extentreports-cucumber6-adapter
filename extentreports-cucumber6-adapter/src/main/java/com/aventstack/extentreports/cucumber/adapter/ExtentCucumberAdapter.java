@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,10 +72,13 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 		{
 			put("image/bmp", "bmp");
 			put("image/gif", "gif");
-			put("image/jpeg", "jpg");
+			put("image/jpeg", "jpeg");
+			put("image/jpg", "jpg");
 			put("image/png", "png");
 			put("image/svg+xml", "svg");
-			put("video/ogg", "ogg");
+			//TODO Video, txt, html, pdf etc.
+			//put("video/ogg", "ogg");
+			//put("video/mp4", "mp4");
 		}
 	};
 
@@ -218,28 +222,39 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 	}
 
 	private synchronized void handleEmbed(EmbedEvent event) {
+
 		String mimeType = event.getMediaType();
 		String extension = MIME_TYPES_EXTENSIONS.get(mimeType);
 		if (extension != null) {
-			StringBuilder fileName = new StringBuilder("embedded").append(EMBEDDED_INT.incrementAndGet()).append(".")
-					.append(extension);
-			try {
-				URL url = toUrl(fileName.toString());
-				writeBytesToURL(event.getData(), url);
+			if (stepTestThreadLocal.get() == null) {
+				ExtentTest t = scenarioThreadLocal.get().createNode(Asterisk.class, "Embed");
+				stepTestThreadLocal.set(t);
+			}
+
+			String title = event.getName() == null ? "" : event.getName();
+			if (ExtentService.isBase64ImageSrcEnabled() && mimeType.startsWith("image/")) {
+				stepTestThreadLocal.get().info(title, MediaEntityBuilder
+						.createScreenCaptureFromBase64String(Base64.getEncoder().encodeToString(event.getData()))
+						.build());
+			} else {
+				StringBuilder fileName = new StringBuilder("embedded").append(EMBEDDED_INT.incrementAndGet())
+						.append(".").append(extension);
 				try {
-					File f = new File(url.toURI());
-					if (stepTestThreadLocal.get() == null) {
-						ExtentTest t = scenarioThreadLocal.get().createNode(Asterisk.class, "Embed");
-						stepTestThreadLocal.set(t);
+					URL url = toUrl(fileName.toString());
+					writeBytesToURL(event.getData(), url);
+					try {
+						File file = new File(url.toURI());
+						stepTestThreadLocal.get().info(title,
+								MediaEntityBuilder
+										.createScreenCaptureFromPath(
+												ExtentService.getScreenshotReportRelatvePath() + file.getName())
+										.build());
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
 					}
-					stepTestThreadLocal.get().info("", MediaEntityBuilder
-							.createScreenCaptureFromPath(ExtentService.getScreenshotReportRelatvePath() + f.getName())
-							.build());
-				} catch (URISyntaxException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	}
@@ -294,8 +309,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 			ExtentService.getInstance().setGherkinDialect(feature.getLanguage());
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-		}		
-		
+		}
+
 		if (feature != null) {
 			if (featureMap.containsKey(feature.getName())) {
 				featureTestThreadLocal.set(featureMap.get(feature.getName()));

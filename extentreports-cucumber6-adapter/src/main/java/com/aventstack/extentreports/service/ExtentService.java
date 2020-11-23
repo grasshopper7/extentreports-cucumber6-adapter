@@ -46,6 +46,10 @@ public class ExtentService implements Serializable {
 	public static String getScreenshotReportRelatvePath() {
 		return ExtentReportsLoader.SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH;
 	}
+	
+	public static boolean isBase64ImageSrcEnabled() {
+		return ExtentReportsLoader.ENABLE_BASE64_IMAGE_SRC;
+	}
 
 	@SuppressWarnings("unused")
 	private ExtentReports readResolve() {
@@ -65,6 +69,7 @@ public class ExtentService implements Serializable {
 		private static final String CONFIG = "config";
 		private static final String OUT = "out";
 		private static final String VIEW_ORDER = "vieworder";
+		private static final String BASE64_IMAGE_SRC = "base64imagesrc";
 		private static final String DELIM = ".";
 
 		private static final String KLOV = "klov";
@@ -85,6 +90,9 @@ public class ExtentService implements Serializable {
 		private static final String OUT_PDF_KEY = EXTENT_REPORTER + DELIM + PDF + DELIM + OUT;
 
 		private static final String VIEW_ORDER_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + VIEW_ORDER;
+		private static final String BASE64_IMAGE_SRC_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + BASE64_IMAGE_SRC;
+		
+		private static boolean ENABLE_BASE64_IMAGE_SRC = false;
 
 		private static String SCREENSHOT_FOLDER_NAME;
 		private static String SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH;
@@ -215,6 +223,7 @@ public class ExtentService implements Serializable {
 			String out = getOutputPath(properties, OUT_SPARK_KEY);
 			ExtentSparkReporter spark = new ExtentSparkReporter(out);
 			sparkReportViewOrder(spark);
+			sparkBase64PngImageStyle();
 			attach(spark, properties, CONFIG_SPARK_KEY);
 		}
 
@@ -225,6 +234,12 @@ public class ExtentService implements Serializable {
 				spark.viewConfigurer().viewOrder().as(viewOrder).apply();
 			} catch (Exception e) {
 				//Do nothing. Use default order.
+			}
+		}
+		
+		private static void sparkBase64PngImageStyle() {
+			if("true".equals(String.valueOf(properties.getOrDefault(BASE64_IMAGE_SRC_SPARK_KEY, "false")))) {
+				ENABLE_BASE64_IMAGE_SRC = true;
 			}
 		}
 
