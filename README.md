@@ -56,6 +56,13 @@ basefolder.datetimepattern=d-MMM-YY HH-mm-ss
 
 With the above settings, a base folder with the name '**reports 10-Aug-20 10-25-50**' will contain the reports. Screenshots if any, will be located inside the '**reports 10-Aug-20 10-25-50/test-output**' folder structure. Similarly the report will be created in the '**reports 10-Aug-20 10-25-50/test-output/SparkReport**' folder structure.
 
+**Attach Image as Base64 String** *(NEW FEATURE)* - This feature can be used to attach images to the Spark report by setting the **src attribute of the img tag to a Base64 encoded string** of the image. When this feature is used, no physical file is created. There is no need to modify any step definition code to use this. To enable this, use the below settings in extent.properties, which is false by default.
+
+```
+extent.reporter.spark.base64imagesrc=true
+```
+The Spark report file size will be **pretty large and there could be memory issues** if a substantial number of images are present. A generic thumbnail is created and on clicking the image is displayed.
+
 **Environment or System Info Properties** *(NEW FEATURE)* - It is now possible to add environment or system info properties in the extent.properties or pass them in the maven command line. The key string should begin with the prefix - 'systeminfo.'. **Be careful of the dot at the end**. For more details refer to the **Environment or System Info Properties** section of the [article](http://grasshopper.tech/2098/).
 
 ```
