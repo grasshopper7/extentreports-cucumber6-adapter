@@ -13,6 +13,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import com.aventstack.extentreports.GherkinKeyword;
 import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.gherkin.model.Asterisk;
+import com.aventstack.extentreports.gherkin.model.ScenarioOutline;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
 import com.aventstack.extentreports.model.Test;
 import com.aventstack.extentreports.service.ExtentService;
@@ -66,6 +68,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 	private static ThreadLocal<ExtentTest> scenarioThreadLocal = new InheritableThreadLocal<>();
 	private static ThreadLocal<Boolean> isHookThreadLocal = new InheritableThreadLocal<>();
 	private static ThreadLocal<ExtentTest> stepTestThreadLocal = new InheritableThreadLocal<>();
+	private static ThreadLocal<Set<String>> featureTagsThreadLocal = new InheritableThreadLocal<>();
+	private static ThreadLocal<Set<String>> scenarioOutlineTagsThreadLocal = new InheritableThreadLocal<>();
 
 	@SuppressWarnings("serial")
 	private static final Map<String, String> MIME_TYPES_EXTENSIONS = new HashMap<String, String>() {
@@ -76,9 +80,9 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 			put("image/jpg", "jpg");
 			put("image/png", "png");
 			put("image/svg+xml", "svg");
-			//TODO Video, txt, html, pdf etc.
-			//put("video/ogg", "ogg");
-			//put("video/mp4", "mp4");
+			// TODO Video, txt, html, pdf etc.
+			// put("video/ogg", "ogg");
+			// put("video/mp4", "mp4");
 		}
 	};
 
@@ -325,9 +329,9 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 					feature.getDescription());
 			featureTestThreadLocal.set(t);
 			featureMap.put(feature.getName(), t);
-			List<String> tagList = feature.getTagsList().stream().map(tag -> tag.getName())
-					.collect(Collectors.toList());
-			tagList.forEach(featureTestThreadLocal.get()::assignCategory);
+
+			Set<String> tagList = feature.getTagsList().stream().map(tag -> tag.getName()).collect(Collectors.toSet());
+			featureTagsThreadLocal.set(tagList);
 		}
 	}
 
@@ -366,10 +370,9 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 			scenarioOutlineThreadLocal.set(t);
 			scenarioOutlineMap.put(scenarioOutline.getName(), t);
 
-			List<String> featureTags = scenarioOutlineThreadLocal.get().getModel().getParent().getCategorySet().stream()
-					.map(x -> x.getName()).collect(Collectors.toList());
-			scenarioOutline.getTagsList().stream().map(x -> x.getName()).filter(x -> !featureTags.contains(x))
-					.forEach(scenarioOutlineThreadLocal.get()::assignCategory);
+			Set<String> tagList = scenarioOutline.getTagsList().stream().map(tag -> tag.getName())
+					.collect(Collectors.toSet());
+			scenarioOutlineTagsThreadLocal.set(tagList);
 		}
 	}
 
@@ -415,6 +418,14 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 		}
 		if (!testCase.getTags().isEmpty()) {
 			testCase.getTags().forEach(x -> scenarioThreadLocal.get().assignCategory(x));
+		}
+		if (featureTagsThreadLocal.get() != null) {
+			featureTagsThreadLocal.get().forEach(x -> scenarioThreadLocal.get().assignCategory(x));
+		}
+
+		Test parent = scenarioThreadLocal.get().getModel().getParent();
+		if (parent.getBddType() == ScenarioOutline.class && scenarioOutlineTagsThreadLocal.get() != null) {
+			scenarioOutlineTagsThreadLocal.get().forEach(x -> scenarioThreadLocal.get().assignCategory(x));
 		}
 	}
 
