@@ -46,7 +46,7 @@ public class ExtentService implements Serializable {
 	public static String getScreenshotReportRelatvePath() {
 		return ExtentReportsLoader.SCREENSHOT_FOLDER_REPORT_RELATIVE_PATH;
 	}
-	
+
 	public static boolean isBase64ImageSrcEnabled() {
 		return ExtentReportsLoader.ENABLE_BASE64_IMAGE_SRC;
 	}
@@ -90,8 +90,9 @@ public class ExtentService implements Serializable {
 		private static final String OUT_PDF_KEY = EXTENT_REPORTER + DELIM + PDF + DELIM + OUT;
 
 		private static final String VIEW_ORDER_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + VIEW_ORDER;
-		private static final String BASE64_IMAGE_SRC_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM + BASE64_IMAGE_SRC;
-		
+		private static final String BASE64_IMAGE_SRC_SPARK_KEY = EXTENT_REPORTER + DELIM + SPARK + DELIM
+				+ BASE64_IMAGE_SRC;
+
 		private static boolean ENABLE_BASE64_IMAGE_SRC = false;
 
 		private static String SCREENSHOT_FOLDER_NAME;
@@ -146,7 +147,7 @@ public class ExtentService implements Serializable {
 		}
 
 		private static void createViaSystem() {
-			
+
 			if ("true".equals(System.getProperty(INIT_KLOV_KEY)))
 				initKlov(null);
 
@@ -233,12 +234,12 @@ public class ExtentService implements Serializable {
 						.map(v -> ViewName.valueOf(v.toUpperCase())).collect(Collectors.toList());
 				spark.viewConfigurer().viewOrder().as(viewOrder).apply();
 			} catch (Exception e) {
-				//Do nothing. Use default order.
+				// Do nothing. Use default order.
 			}
 		}
-		
+
 		private static void sparkBase64PngImageStyle() {
-			if("true".equals(String.valueOf(properties.getOrDefault(BASE64_IMAGE_SRC_SPARK_KEY, "false")))) {
+			if ("true".equals(String.valueOf(properties.getOrDefault(BASE64_IMAGE_SRC_SPARK_KEY, "false")))) {
 				ENABLE_BASE64_IMAGE_SRC = true;
 			}
 		}
@@ -251,7 +252,8 @@ public class ExtentService implements Serializable {
 
 		private static void initPdf(Properties properties) {
 			String out = getOutputPath(properties, OUT_PDF_KEY);
-			ExtentPDFCucumberReporter pdf = new ExtentPDFCucumberReporter(out);
+			configureScreenshotProperties();
+			ExtentPDFCucumberReporter pdf = new ExtentPDFCucumberReporter(out, SCREENSHOT_FOLDER_NAME);
 			INSTANCE.attachReporter(pdf);
 		}
 
