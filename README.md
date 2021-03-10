@@ -33,7 +33,9 @@ screenshot.rel.path=../
 
 **Extent PDF Reporter** *(NEW FEATURE)* - The PDF reporter summarizes the test run results in a **dashboard** and other sections with **feature, scenario and step details**.
 
-![sample](summary.png)
+
+![sample](https://raw.githubusercontent.com/grasshopper7/extentreports-cucumber6-adapter/master/summary.png)
+
 
 The PDF report is needs to be enabled in the extent.properties file.
 ```
