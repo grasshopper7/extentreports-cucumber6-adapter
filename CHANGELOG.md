@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-# 2.6.0 (2020-12-13)
+# 2.7.0 (2020-12-13)
 
 * Incorrect scenario count for tags\categories [Issue 33](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/33)]
 
