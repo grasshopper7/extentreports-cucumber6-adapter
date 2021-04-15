@@ -192,7 +192,7 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 			stepTestThreadLocal.get().fail("Step undefined");
 			break;
 		case "pending":
-			stepTestThreadLocal.get().fail("Step pending");
+			stepTestThreadLocal.get().fail(result.getError());
 			break;
 		case "skipped":
 			if (isHookThreadLocal.get()) {
