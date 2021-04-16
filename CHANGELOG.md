@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# 2.8.0 (2021-04-16)
+
+* Store step pending status exception stacktrace [Issue 37](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/37)
+* Updated extentreport version to 5.0.6
+* Updated pdf reporter version to 2.2.0
+
 # 2.7.0 (2021-03-09)
 
 * Incorrect scenario count for tags\categories [Issue 33](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/33)
