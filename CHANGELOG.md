@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# 2.8.1 (2021-04-20)
+
+* Updated pdf reporter version to 2.2.1
+
 # 2.8.0 (2021-04-16)
 
 * Store step pending status exception stacktrace [Issue 37](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/37)
