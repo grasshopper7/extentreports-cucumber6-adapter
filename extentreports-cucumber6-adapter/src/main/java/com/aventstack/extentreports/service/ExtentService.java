@@ -23,6 +23,9 @@ import com.aventstack.extentreports.reporter.ReporterConfigurable;
 import com.aventstack.extentreports.reporter.configuration.ViewName;
 
 import tech.grasshopper.pdf.extent.ExtentPDFCucumberReporter;
+import tech.grasshopper.pdf.extent.processor.MediaProcessor;
+import tech.grasshopper.pdf.section.details.executable.MediaCleanup.CleanupType;
+import tech.grasshopper.pdf.section.details.executable.MediaCleanup.MediaCleanupOption;
 
 public class ExtentService implements Serializable {
 
@@ -253,7 +256,9 @@ public class ExtentService implements Serializable {
 		private static void initPdf(Properties properties) {
 			String out = getOutputPath(properties, OUT_PDF_KEY);
 			configureScreenshotProperties();
-			ExtentPDFCucumberReporter pdf = new ExtentPDFCucumberReporter(out, SCREENSHOT_FOLDER_NAME);
+			MediaCleanupOption mediaCleanup = MediaCleanupOption.builder().cleanUpType(CleanupType.PATTERN)
+					.pattern(MediaProcessor.EMBEDDED_PREFIX + ".*").build();
+			ExtentPDFCucumberReporter pdf = new ExtentPDFCucumberReporter(out, SCREENSHOT_FOLDER_NAME, mediaCleanup);
 			INSTANCE.attachReporter(pdf);
 		}
 
