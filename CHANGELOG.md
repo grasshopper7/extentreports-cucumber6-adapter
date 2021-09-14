@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# 2.8.4 (2021-09-14)
+
+* Updated pdf report data collector version to 1.7.4
+
 # 2.8.3 (2021-08-3)
 
 * Remove temporary base64 images for pdf [Issue 40](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/40)]
