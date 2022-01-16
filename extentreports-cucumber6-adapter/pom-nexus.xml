@@ -5,7 +5,7 @@
 
 	<groupId>tech.grasshopper</groupId>
 	<artifactId>extentreports-cucumber6-adapter</artifactId>
-	<version>2.8.4</version>
+	<version>2.9.0</version>
 	<name>extentreports-cucumber6-adapter</name>
 	<url>https://ghchirp.tech/2098/</url>
 	<description>Cucumber-JVM 6 adapter for Extent Framework</description>
@@ -30,8 +30,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cucumber.version>6.10.4</cucumber.version>
-		<extent.version>5.0.8</extent.version>
+		<extent.version>5.0.9</extent.version>
 		<pdfreporter.version>1.7.4</pdfreporter.version>
+		<htmlreporter.version>1.0.0</htmlreporter.version>
 	</properties>
 
 	<scm>
@@ -45,12 +46,6 @@
 			<groupId>com.aventstack</groupId>
 			<artifactId>extentreports</artifactId>
 			<version>${extent.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.testng</groupId>
-					<artifactId>testng</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>tech.grasshopper</groupId>
@@ -61,6 +56,11 @@
 			<groupId>com.aventstack</groupId>
 			<artifactId>klov-reporter</artifactId>
 			<version>${extent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>tech.grasshopper</groupId>
+			<artifactId>htmlextentreporter</artifactId>
+			<version>${htmlreporter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.cucumber</groupId>
