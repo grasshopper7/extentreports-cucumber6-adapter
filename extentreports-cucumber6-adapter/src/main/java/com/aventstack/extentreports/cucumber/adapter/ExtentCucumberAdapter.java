@@ -339,7 +339,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 		TestSourcesModel.AstNode astNode = testSources.getAstNode(currentFeatureFile.get(), testCase.getLine());
 		Scenario scenarioDefinition = TestSourcesModel.getScenarioDefinition(astNode);
 
-		if (scenarioDefinition.getKeyword().equals("Scenario Outline")) {
+		// if (scenarioDefinition.getKeyword().equals("Scenario Outline")) {
+		if (scenarioDefinition.getExamplesCount() > 0) {
 			if (currentScenarioOutline.get() == null
 					|| !currentScenarioOutline.get().getName().equals(scenarioDefinition.getName())) {
 				scenarioOutlineThreadLocal.set(null);
@@ -370,6 +371,11 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 			scenarioOutlineThreadLocal.set(t);
 			scenarioOutlineMap.put(scenarioOutline.getName(), t);
 
+			if (featureTagsThreadLocal.get() != null) {
+				featureTagsThreadLocal.get().forEach(x -> t.assignCategory(x));
+			}
+			scenarioOutline.getTagsList().stream().map(tag -> tag.getName()).forEach(c -> t.assignCategory(c));
+
 			Set<String> tagList = scenarioOutline.getTagsList().stream().map(tag -> tag.getName())
 					.collect(Collectors.toSet());
 			scenarioOutlineTagsThreadLocal.set(tagList);
@@ -385,7 +391,8 @@ public class ExtentCucumberAdapter implements ConcurrentEventListener {
 		if (examples.getName() != null && !examples.getName().isEmpty()) {
 			markup = examples.getName() + markup;
 		}
-		markup = scenarioOutlineThreadLocal.get().getModel().getDescription() + markup;
+		markup = (scenarioOutlineThreadLocal.get().getModel().getDescription() == null ? ""
+				: scenarioOutlineThreadLocal.get().getModel().getDescription() + "<br><br>") + markup;
 		scenarioOutlineThreadLocal.get().getModel().setDescription(markup);
 	}
 
