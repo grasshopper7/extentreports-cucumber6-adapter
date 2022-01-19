@@ -3,8 +3,8 @@ All notable changes to this project will be documented in this file.
 
 # 2.9.0 (2022-01-16)
 
-* Add HTMLExtentReporter to adapter [Issue 48](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/48)]
-* Scenario Outline with non default dialect display issue [Issue 47](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/47)]
+* Add HTMLExtentReporter to adapter [Issue 48](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/48)
+* Scenario Outline with non default dialect display issue [Issue 47](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/47)
 
 # 2.8.4 (2021-09-14)
 
