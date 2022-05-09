@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# 2.11.0 (2022-05-09)
+
+* Updated pdf report data collector version to 2.5.0
+
 # 2.10.4 (2022-04-28)
 
 * Updated pdf report data collector version to 2.4.1
