@@ -140,8 +140,12 @@ public class ExtentService implements Serializable {
 		private static final String SCREENSHOT_DIR_PROPERTY = "screenshot.dir";
 		private static final String SCREENSHOT_REL_PATH_PROPERTY = "screenshot.rel.path";
 
-		private static final String REPORTS_BASEFOLDER_NAME = "basefolder.name";
-		private static final String REPORTS_BASEFOLDER_DATETIMEPATTERN = "basefolder.datetimepattern";
+		private static final String REPORTS_BASEFOLDER = "basefolder";
+		private static final String REPORTS_BASEFOLDER_NAME = REPORTS_BASEFOLDER + DELIM + "name";
+		private static final String REPORTS_BASEFOLDER_DATETIMEPATTERN = REPORTS_BASEFOLDER + DELIM + "datetimepattern";
+		private static final String REPORTS_BASEFOLDER_ENABLEDELIMITER = REPORTS_BASEFOLDER + DELIM
+				+ "enable.delimiter";
+		private static final String REPORTS_BASEFOLDER_DELIMITER = REPORTS_BASEFOLDER + DELIM + "delimiter";
 		private static final LocalDateTime FOLDER_CURRENT_TIMESTAMP = LocalDateTime.now();
 
 		private static boolean IS_DEVICE_ENABLED = false;
@@ -221,11 +225,16 @@ public class ExtentService implements Serializable {
 			String folderpattern = "";
 			Object baseFolderPrefix = getProperty(REPORTS_BASEFOLDER_NAME);
 			Object baseFolderPatternSuffix = getProperty(REPORTS_BASEFOLDER_DATETIMEPATTERN);
+			String enableDelimiter = String.valueOf(getPropertyOrDefault(REPORTS_BASEFOLDER_ENABLEDELIMITER, "true"));
+			String delimiter = String.valueOf(getPropertyOrDefault(REPORTS_BASEFOLDER_DELIMITER, " "));
+
+			if (enableDelimiter.equalsIgnoreCase("false"))
+				delimiter = "";
 
 			if (baseFolderPrefix != null && !String.valueOf(baseFolderPrefix).isEmpty()
 					&& baseFolderPatternSuffix != null && !String.valueOf(baseFolderPatternSuffix).isEmpty()) {
 				DateTimeFormatter folderSuffix = DateTimeFormatter.ofPattern(String.valueOf(baseFolderPatternSuffix));
-				folderpattern = baseFolderPrefix + " " + folderSuffix.format(FOLDER_CURRENT_TIMESTAMP) + "/";
+				folderpattern = baseFolderPrefix + delimiter + folderSuffix.format(FOLDER_CURRENT_TIMESTAMP) + "/";
 			}
 			return folderpattern;
 		}
