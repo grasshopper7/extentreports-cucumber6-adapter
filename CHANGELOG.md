@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# 2.14.0 (2022-11-05)
+
+* Add device and author information as tags [Issue 52](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/52)
+
 # 2.13.1 (2022-11-02)
 
 * Fixed tag count & test display for scenario outline [Issue 51](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/51)
