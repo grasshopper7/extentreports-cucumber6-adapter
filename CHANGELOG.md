@@ -1,7 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-# 2.14.1 (2022-11-10)
+# 2.14.2 (2022-11-11)
+
+* Add support for status filter for PDF report [Issue 55](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/55)
+
+# 2.14.2 (2022-11-10)
 
 * Add support for status filter for Spark report [Issue 54](https://github.com/grasshopper7/extentreports-cucumber6-adapter/issues/54)
 
