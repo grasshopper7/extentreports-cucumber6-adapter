@@ -5,7 +5,7 @@
 
 	<groupId>tech.grasshopper</groupId>
 	<artifactId>extentreports-cucumber6-adapter</artifactId>
-	<version>2.14.3</version>
+	<version>2.15.0</version>
 	<name>extentreports-cucumber6-adapter</name>
 	<url>https://ghchirp.online/2098/</url>
 	<description>Cucumber-JVM 6 adapter for Extent Framework</description>
@@ -31,7 +31,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cucumber.version>6.10.4</cucumber.version>
 		<extent.version>5.0.9</extent.version>
-		<pdfreporter.version>2.9.0</pdfreporter.version>
+		<pdfreporter.version>2.9.1</pdfreporter.version>
 		<htmlreporter.version>1.0.1</htmlreporter.version>
 	</properties>
 
@@ -76,13 +76,13 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.13.4.1</version>
+			<version>2.14.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.10.0</version>
+			<version>2.14.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
