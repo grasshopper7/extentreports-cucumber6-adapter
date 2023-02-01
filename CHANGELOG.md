@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# 2.16.0 (2023-02-01)
+
+* Added excel reporter
+
 # 2.15.0 (2022-11-14)
 
 * Add support for status filter for html report
