@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+# 2.17.0 (2023-05-12)
+
+* Update pdf report version
+
 # 2.16.0 (2023-02-01)
 
 * Added excel reporter
